@@ -1,8 +1,9 @@
 # Youtube Mixer
 
 ## About
-This is a very rough draft for a Youtube Crossfader.
-No guarantee. The draft has been tested under OS X Yosemite & Sierra, with Google Chrome & Safari.
+This is a very rough draft for a Youtube crossfader.
+The draft has been tested under OS X Yosemite & Sierra, with Google Chrome & Safari.
+No guarantee. 
 
 
 ## Live
