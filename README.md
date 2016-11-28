@@ -3,7 +3,7 @@
 ## About
 This is a very rough draft for a Youtube crossfader.
 The draft has been tested under OS X Yosemite & Sierra, with Google Chrome & Safari.
-No guarantee. 
+No guarantee. This is messy code.
 
 
 ## Live
