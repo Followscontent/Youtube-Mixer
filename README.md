@@ -25,7 +25,7 @@ http://processingjs.org/
 The visuals are based on the Yellowtails Example form the APDE Source Code by Calsign Labs<br>
 https://github.com/Calsign/APDE
 
-Youtube embed based on a script by Yvo Schaap
+Youtube embed based on a script by Yvo Schaap<br>
 http://yvoschaap.com
 
 And tons of examples from stackoverflow about the Youtube 3 API.
