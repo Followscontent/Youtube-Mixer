@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Youtube search</title>
+
+
+		<link href="https://fonts.googleapis.com/css?family=Delius+Unicase" rel="stylesheet">
+		<link rel="stylesheet" type="text/css" href="css/style.css">
+		<link rel="stylesheet" type="text/css" href="css/jquery-ui.css">
+
+		<script src="js/jquery.min.js"></script>
+		<script src="js/jquery-ui.min.js"></script>
+		<script src="js/youtube-embed.js"></script>
+		<script src="js/processing.js"></script>
+		<script src="https://www.youtube.com/iframe_api"></script>
+
+	</head>
+	<body>
+		<div class="header">
+			<input id="volume-input" type="range" max="100" min="0" value="0">
+		</div>
+
+		<div class="output">
+			<div id="player-left"></div>
+			<div id="player-right"></div>
+		</div>
+
+		<div id="search-left">
+			<input id="searchfield-left" class="searchfield" name="thumbs-left" type="text" value="" placeholder="Search for left desk">
+			<div id="thumbs-left"></div>
+		</div>
+
+		<div id="search-right">
+			<input id="searchfield-right" class="searchfield" name="thumbs-right" type="text" value="" placeholder="Search for right desk">
+			<div id="thumbs-right"></div>
+		</div>
+
+		<!-- @include _processingsketch -->
+
+
+		<div class="footer">
+			<a href="playlist.html" title="video only">goto playlist</a>
+		</div>
+
+		<script>
+			// Variables and Elements
+			var currentFocus = "left";
+			var playerLeft;
+			var playerRight;
+			var suggestCallBack; 
+
+			$(document).ready(function() {
+				//
+				// Trigger Enter Key
+				$(".searchfield").keyup(function(event){
+					var searchstring = $(this).val();
+					var target = $(this).attr("name")
+						ytEmbed.init({'block':target,'key':'AIzaSyDGWVqSqXEpNdZhLzdIMvaF9swi-3viwn0','q':searchstring,'type':'search','results':15,'meta':true,'player':'embed','layout':'thumbnails'});
+						console.log("search");
+				});
+				//
+				// Autocomplete
+				$(".searchfield").autocomplete({
+			        source: function(request, response) {
+			            $.getJSON("https://suggestqueries.google.com/complete/search?callback=?",
+			                {
+			                  "hl":"en", // Language
+			                  "ds":"yt", // Restrict lookup to youtube
+			                  "jsonp":"suggestCallBack", // jsonp callback function name
+			                  "q":request.term, // query term
+			                  "client":"youtube" // force youtube style response, i.e. jsonp
+			                }
+			            );
+			            suggestCallBack = function (data) {
+			                var suggestions = [];
+			                $.each(data[1], function(key, val) {
+			                    suggestions.push({"value":val[0]});
+			                });
+			                suggestions.length = 5; // prune suggestions list to only 5 items
+			                response(suggestions);
+			            };
+			        },
+			    });
+				$("#search-left").mouseover(function() {
+					currentFocus = "left";
+				});
+				$("#search-right").mouseover(function() {
+					currentFocus = "right";
+				});
+				$(".ui-autocomplete").click(function() {
+				  	$(".searchfield").trigger( "keyup" );
+				});
+
+				// Crossfader interval
+				setInterval(function(){
+					playerLeft.setVolume(100-$('#volume-input').val());
+					playerRight.setVolume($('#volume-input').val());
+					translateOutput($('#volume-input').val());
+					// console.log('enterframe');
+				}, 33);
+
+				// Toggle Visuals
+				$("#visuals-button").click(function() {
+					$(this).toggleClass('active');
+
+					var text = $('#visuals-button').text();
+					$('#visuals-button').text(text == "Draw Visuals" ? "Hide Visuals" : "Draw Visuals");
+					$('#visuals-canvas').fadeToggle();
+					$('#visuals-message').show();
+				});
+
+				
+			});
+			//
+			// Handle page resizing for processing js
+			$(window).resize(function() {
+				var pjs = Processing.getInstanceById('visuals-canvas');
+				pjs.resizeSketch(document.getElementById('visuals-canvas').offsetWidth,  document.getElementById('visuals-canvas').offsetHeight);
+			});
+
+			function translateOutput(val) {
+				var m = -(val * 0.5 - 25);
+				$('.output').css("margin-left", m + "%");
+			}
+			//
+			// Load a new Video to the currently focused Player
+			function triggerVideo(url) {
+				if ( currentFocus == "left") {
+					playerLeft.loadVideoById(url);
+				} else {
+					playerRight.loadVideoById(url);
+				}
+			};
+			//
+			// Load initial Videos
+			function onYouTubeIframeAPIReady() {
+				playerLeft = new YT.Player('player-left', {
+					height: '360',
+					width: '640',
+					videoId: 'kfoJUeyMsOE'
+				});
+				playerRight = new YT.Player('player-right', {
+					height: '360',
+					width: '640',
+					videoId: 'f7wkRET0hbo'
+				});
+			};
+		</script>
+	</body>
+</html>
